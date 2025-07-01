@@ -1,0 +1,71 @@
+{% extends "main/base_layout.html" %}
+{% import "main/_form_macros.html" as forms %}
+
+{% block title %}My Profile - {{ super() }}{% endblock %}
+
+{% block app_content %}
+<div class="container mt-4">
+    <h1 class="mb-4">My Profile</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ current_user.username }}</h5>
+            <p class="card-text">
+                <strong>Email:</strong> {{ current_user.email }}<br>
+                <strong>Role:</strong> {{ current_user.role.replace('_', ' ')|title }}<br>
+                <strong>First Name:</strong> {{ current_user.first_name or 'Not set' }}<br>
+                <strong>Last Name:</strong> {{ current_user.last_name or 'Not set' }}<br>
+                <strong>Phone:</strong> {{ current_user.phone_number or 'Not set' }}<br>
+                <strong>Member Since:</strong> {{ current_user.date_created.strftime('%Y-%m-%d') if current_user.date_created else 'N/A' }}<br>
+                <strong>Last Login:</strong> {{ current_user.last_login.strftime('%Y-%m-%d %H:%M:%S UTC') if current_user.last_login else 'Never' }}<br>
+            </p>
+            <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+            <!-- Add link to change password form later -->
+            <!-- <a href="#" class="btn btn-secondary">Change Password</a> -->
+        </div>
+    </div>
+
+    {% if current_user.role == 'fse_owner' %}
+        <h2 class="mt-5">My Establishments</h2>
+        {% if current_user.fses_owned.all() %}
+            <ul class="list-group">
+                {% for fse in current_user.fses_owned %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('main.view_fse', fse_id=fse.id) }}">{{ fse.name }}</a> - {{ fse.location_address }}
+                        <!-- Link to view assessments for this FSE -->
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You currently do not own any registered establishments.</p>
+            <!-- Link for FSE owner to request FSE registration or linking? -->
+        {% endif %}
+    {% endif %}
+
+     {% if current_user.role == 'assessor' %}
+        <h2 class="mt-5">My Assessments Conducted</h2>
+        {% if current_user.assessments_conducted.all() %}
+            <ul class="list-group">
+                {% for assessment in current_user.assessments_conducted.order_by(Assessment.assessment_date.desc()).limit(10) %}
+                    <li class="list-group-item">
+                        Assessment for <a href="{{ url_for('main.view_fse', fse_id=assessment.fse.id) }}">{{ assessment.fse.name }}</a>
+                        on {{ assessment.assessment_date.strftime('%Y-%m-%d') }}
+                        - Score: {{ assessment.total_score }}/100 ({{ assessment.star_rating }} Stars)
+                        <a href="{{ url_for('main.view_assessment_details', assessment_id=assessment.id) }}" class="btn btn-sm btn-info float-end">Details</a>
+                    </li>
+                {% endfor %}
+                 {% if current_user.assessments_conducted.count() > 10 %}
+                    <li class="list-group-item text-center">
+                        <a href="#">View all assessments</a>
+                    </li>
+                {% endif %}
+            </ul>
+        {% else %}
+            <p>You have not conducted any assessments yet.</p>
+        {% endif %}
+        <div class="mt-3">
+             <a href="{{ url_for('main.submit_assessment_form') }}" class="btn btn-success">Conduct New Assessment</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

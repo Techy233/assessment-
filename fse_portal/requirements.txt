@@ -1,0 +1,8 @@
+Flask>=2.0
+Flask-SQLAlchemy>=2.5
+Flask-Login>=0.5
+Flask-WTF>=1.0
+Werkzeug>=2.0
+# psycopg2-binary # Example if using PostgreSQL later
+# python-dotenv    # For loading .env files if used for config
+# Flask-Migrate    # If we add database migrations later

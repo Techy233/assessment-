@@ -1,0 +1,41 @@
+{% extends "main/base_layout.html" %}
+
+{% block title %}Admin Dashboard - {{ super() }}{% endblock %}
+
+{% block app_content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Administrator Dashboard</h1>
+    <p>Welcome, {{ current_user.username }} (Admin)!</p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">User Management</h5>
+                    <p class="card-text">Create, edit, and manage user accounts.</p>
+                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-primary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">FSE Management</h5>
+                    <p class="card-text">Manage Food Service Establishments.</p>
+                    <a href="{{ url_for('admin.manage_fses') }}" class="btn btn-primary">Manage FSEs</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">View All Assessments</h5>
+                    <p class="card-text">Oversee all assessments in the system.</p>
+                    <a href="{{ url_for('admin.view_all_assessments') }}" class="btn btn-primary">View Assessments</a>
+                </div>
+            </div>
+        </div>
+        <!-- Add more admin functionalities here -->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "main/base_layout.html" %}
+
+{% block title %}FSE Owner Dashboard - {{ super() }}{% endblock %}
+
+{% block app_content %}
+<div class="container mt-4">
+    <h1 class="mb-4">FSE Owner Dashboard</h1>
+    <p>Welcome, {{ current_user.username }} (FSE Owner/Manager)!</p>
+
+    <h2 class="mt-5">My Registered Establishments</h2>
+    {% set my_fses = current_user.fses_owned.all() %}
+    {% if my_fses %}
+        {% for fse in my_fses %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4><a href="{{ url_for('main.view_fse', fse_id=fse.id) }}">{{ fse.name }}</a></h4>
+                    <p class="mb-0">{{ fse.location_address }}</p>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Recent Assessment History (Last 3)</h5>
+                    {% set fse_assessments = fse.assessments.order_by(Assessment.assessment_date.desc()).limit(3).all() %}
+                    {% if fse_assessments %}
+                        <ul class="list-group list-group-flush">
+                            {% for assessment in fse_assessments %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        Assessed on: {{ assessment.assessment_date.strftime('%Y-%m-%d') }} by {{ assessment.assessor_user.username }}<br>
+                                        Score: <strong>{{ assessment.total_score }}/100</strong> - Rating: <strong>{{ assessment.star_rating }} Stars</strong>
+                                    </div>
+                                    <a href="{{ url_for('fse_owner.view_assessment_details', assessment_id=assessment.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% if fse.assessments.count() > 3 %}
+                            <div class="text-center mt-2">
+                                <a href="{{ url_for('fse_owner.view_all_fse_assessments', fse_id=fse.id) }}" class="btn btn-sm btn-secondary">View All Assessments for {{fse.name}}</a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p>No assessment history found for this establishment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            You do not have any Food Service Establishments linked to your account.
+            Please contact an administrator if you believe this is an error.
+        </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('main.profile') }}" class="btn btn-info">View/Edit My Profile</a>
+    </div>
+</div>
+{% endblock %}
